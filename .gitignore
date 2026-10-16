@@ -1,3 +1,13 @@
+*.o
+*.obj
+esz7-term
+cmake-build-*
+cmake-release-*
+/build-Debug/*
+/build-Release/*
+/dist-Debug/*
+/dist-Release/*
+
 # Prerequisites
 *.d
 

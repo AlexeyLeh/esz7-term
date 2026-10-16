@@ -1,0 +1,34 @@
+ColumnLimit: 120
+IndentWidth: 4
+UseTab: true
+
+AlignTrailingComments: true
+
+AllowShortIfStatementsOnASingleLine: WithoutElse
+
+AllowShortFunctionsOnASingleLine: Empty
+
+AllowShortCaseLabelsOnASingleLine: false
+
+#AlignConsecutiveShortCaseStatements:
+#  Enabled: true
+#  AcrossEmptyLines: false
+#  AcrossComments: false
+#  AlignCaseArrows: false
+#  AlignCaseColons: false
+
+AlignConsecutiveShortCaseStatements :
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCaseArrows: true
+  AlignCaseColons: false
+
+
+#BreakBeforeBraces: WebKit
+BreakBeforeBraces: Linux
+
+BraceWrapping:
+  AfterCaseLabel: false
+
+IndentCaseBlocks: true

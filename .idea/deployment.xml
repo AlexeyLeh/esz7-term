@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="xme0724" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="xme0724">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/root/bin" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/root/bin" local="$PROJECT_DIR$/cmake-build-arm-debug" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

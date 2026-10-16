@@ -1,0 +1,31 @@
+﻿1. prepare for project building
+
+    $ mkdir build
+    $ cd build
+    $ cmake -G "MinGW Makefiles" ..
+or
+    $ cmake -G "MinGW Makefiles" -B build .
+
+
+
+2. build project
+
+2.1
+    $ cd build
+    $ make
+or
+    $ make -C build
+
+
+
+3. project clean 
+
+    $ make -C build clean
+
+
+
+4. where app was built
+
+    $ ls -l build/esz7-term
+
+
