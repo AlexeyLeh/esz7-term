@@ -176,59 +176,53 @@ void sram_check(int mode)
     uart_puts("-- SRAM check\n");
 
     //---------- побайтное тестирование
-    uint8_t pattern_8bit[] = {
-	0x00,
-	0xFF,
-	0x7F,
-	0x77,
-	0x44,
-	0x33,
-	0xCC,
-	0x55,
-	0x00,
-	0xAA
-    };
+    uint8_t pattern_8bit[] = {0x00, 0xFF, 0x7F, 0x77, 0x44, 0x33, 0xCC, 0x55, 0x00, 0xAA};
 
-    int pattern_len = (int)(sizeof(pattern_8bit) / sizeof(pattern_8bit[0]));
+    int pattern_len = sizeof(pattern_8bit) / sizeof(pattern_8bit[0]);
     if (mode > 0) {
-	uart_printf("\nByte Check (8-bit) - %d (0x%04X) bytes: \n",
-		    sram_mem_size(), sram_mem_size());
+	    uart_printf("\nByte Check (8-bit) - %d (0x%04X) bytes: \n", sram_mem_size(), sram_mem_size());
     }
 
     //-------------------------------------------
     fails = 0;
     for (int idx = 0; idx < sram_total_channels(); idx++) {
-	uart_printf("Channel: %d - ", idx+1);
-
-	for (int i = 0; i < pattern_len; i++) {
-	    uart_printf("%02X ", pattern_8bit[i]);
-
-	    char *mem = (char *)m_sram.mem[idx];
-	    int counter = sram_mem_size();
-	    while(counter > 0) {
-		*mem = pattern_8bit[i];
-		if (*mem != pattern_8bit[i]) {
-		    fails++;
-		}
-		mem++;
-		counter--;
+	    if (cfg.debug_level > 0) {
+	        uart_printf("Channel: %d - ", idx + 1);
 	    }
 
-	    if (fails != 0) {
-		uart_printf("[E]\n");
-	    }
-	}
-	uart_putc('\n');
+    	for (int i = 0; i < pattern_len; i++) {
+    	    if (cfg.debug_level > 0) {
+        		uart_printf("%02X ", pattern_8bit[i]);
+    	    }
+
+    	    char *mem = (char *)m_sram.mem[idx];
+    	    int counter = sram_mem_size();
+    	    while (counter > 0) {
+    		    *mem = pattern_8bit[i];
+        		if (*mem != pattern_8bit[i]) {
+        		    fails++;
+        		}
+        		mem++;
+        		counter--;
+    	    }
+
+	        if (fails != 0) {
+        		uart_printf("[E]\n");
+    	    }
+    	}
+    	if (cfg.debug_level > 0) {
+    	    uart_putc('\n');
+    	}
     }
 
     if (fails) {
-	uart_printf("--- detected %u errors\n\n", fails);
-	return;
+	    uart_printf("--- detected %u errors\n\n", fails);
+    	return;
     }
 
     if (mode == 0) {
-	uart_puts("\n\n");
-	return;
+    	uart_putc('\n');
+	    return;
     }
 
     //---------- пословное тестирование (64 bit)
@@ -253,47 +247,47 @@ void sram_check(int mode)
 
     fails = 0;
     for (int idx = 0; idx < sram_total_channels(); idx++) {
-	uart_printf("Channel: %d\n", idx+1);
+    	uart_printf("Channel: %d\n", idx + 1);
 
-	for (int i = 0; i < pattern_len; i++) {
-	    uart_printf("%08X", (uint32_t)(pattern_64bit[i] >> 32) & 0x00FFFFFFFF);
-	    uart_printf("%08X ", (uint32_t)(pattern_64bit[i] & 0x00FFFFFFFF));
+    	for (int i = 0; i < pattern_len; i++) {
+	        uart_printf("%08X", (uint32_t)(pattern_64bit[i] >> 32) & 0x00FFFFFFFF);
+	        uart_printf("%08X ", (uint32_t)(pattern_64bit[i] & 0x00FFFFFFFF));
 
-	    uint64_t *mem = (uint64_t *)m_sram.mem[idx];
-	    int counter = nWords;
-	    while(counter > 0) {
-		*mem = pattern_64bit[i];
-		if (*mem != pattern_64bit[i]) {
-		    fails++;
-		}
-		mem++;
-		counter--;
-	    }
-	    usleep(10000);
-	    if (i > 0 && ((i+1) % 5) == 0)
-		uart_putc('\n');
-	}
-	uart_putc('\n');
+	        uint64_t *mem = (uint64_t *)m_sram.mem[idx];
+	        int counter = nWords;
+	        while(counter > 0) {
+        		*mem = pattern_64bit[i];
+	        	if (*mem != pattern_64bit[i]) {
+	        	    fails++;
+	        	}
+	        	mem++;
+	        	counter--;
+	        }
+	        usleep(10000);
+	        if (i > 0 && ((i + 1) % 5) == 0) uart_putc('\n');
+    	}
+	    uart_putc('\n');
     }
 
     if (fails) {
-	uart_printf("detected %u errors\n\n", fails);
-	return;
+	    uart_printf("detected %u errors\n\n", fails);
+    	return;
     }
-    uart_putc('\n');
+    if (cfg.debug_level > 0) {
+    	uart_putc('\n');
+    }
 
     //-------------------------------------------
     for (int idx = 0; idx < sram_total_channels(); idx++) {
-	uart_printf("fill channel %d by %02Xh\n", idx+1, pattern_8bit[idx+1]);
-	char *mem = (char *)m_sram.mem[idx];
-	int counter = sram_mem_size();
-	while(counter > 0) {
-	    *mem = pattern_8bit[idx+1];
-	    mem++;
-	    counter--;
-	}
+    	uart_printf("fill channel %d by %02Xh\n", idx + 1, pattern_8bit[idx + 1]);
+    	char *mem = (char *)m_sram.mem[idx];
+    	int counter = sram_mem_size();
+    	while (counter > 0) {
+    	    *mem = pattern_8bit[idx + 1];
+    	    mem++;
+    	    counter--;
+    	}
     }
-
 }
 
 //---------------------------------------------------------
@@ -313,15 +307,15 @@ void sram_dump()
 
     int bundle;
     if (ch == '0') {
-	    bundle = 0;
+        bundle = 0;
     } else if (ch == '1') {
 	    bundle = 1;
     } else if (ch == '\r' || ch == '\n') {
-	    bundle = 0;
+        bundle = 0;
 	    uart_puts("[0]");
     } else {
-	    uart_puts("\nincorrect number\n");
-	    return;
+        uart_puts("\nincorrect number\n");
+        return;
     }
     uart_putc('\n');
 
@@ -329,15 +323,15 @@ void sram_dump()
 #define NRECS_DEFAULT 16
     int recs = 0;
     uart_printf("Records? [1..%d] (default: %3d) : ", sram()->max_recs, NRECS_DEFAULT);
-    int Err = GetNumber(DECMODE, (uint32_t*)&recs, 3);
+    int Err = GetNumber(DECMODE, (uint32_t *)&recs, 3);
     if (Err) return;
     if (recs == GET_DEFAULT) {
-	recs = NRECS_DEFAULT;
-	uart_printf("[%u]", recs);
+	    recs = NRECS_DEFAULT;
+    	uart_printf("[%u]", recs);
     }
     if (recs > sram()->max_recs) {
-	uart_printf("\nincorrect number - expected not more than %d\n", sram()->max_recs);
-	return;
+	    uart_printf("\nincorrect number - expected not more than %d\n", sram()->max_recs);
+    	return;
     }
     uart_putc('\n');
 
@@ -365,28 +359,28 @@ void print_sram_status(int channel, const SramStat_t *sram_stat)
     // channel - [1..4]
     if (channel == 1) {
 	uart_printf("Len:%d MemEn:%d B0Rdy:%d B1Rdy:%d",
-		    sram_stat->BufLen0,
-		    sram_stat->stat.MemEn0,
+            sram_stat->BufLen0,
+            sram_stat->stat.MemEn0,
 		    sram_stat->stat.Bundl0Rdy0,
-		    sram_stat->stat.Bundl1Rdy0);
+            sram_stat->stat.Bundl1Rdy0);
     } else if (channel == 2) {
 	uart_printf("Len:%d MemEn:%d B0Rdy:%d B1Rdy:%d",
-		    sram_stat->BufLen1,
-		    sram_stat->stat.MemEn1,
+            sram_stat->BufLen1,
+            sram_stat->stat.MemEn1,
 		    sram_stat->stat.Bundl0Rdy1,
-		    sram_stat->stat.Bundl1Rdy1);
+            sram_stat->stat.Bundl1Rdy1);
     } else if (channel == 3) {
 	uart_printf("Len:%d MemEn:%d B0Rdy:%d B1Rdy:%d",
-		    sram_stat->BufLen2,
-		    sram_stat->stat.MemEn2,
+            sram_stat->BufLen2,
+            sram_stat->stat.MemEn2,
 		    sram_stat->stat.Bundl0Rdy2,
-		    sram_stat->stat.Bundl1Rdy2);
+        sram_stat->stat.Bundl1Rdy2);
     } else if (channel == 4) {
 	uart_printf("Len:%d MemEn:%d B0Rdy:%d B1Rdy:%d",
-		    sram_stat->BufLen3,
-		    sram_stat->stat.MemEn3,
+            sram_stat->BufLen3,
+            sram_stat->stat.MemEn3,
 		    sram_stat->stat.Bundl0Rdy3,
-		    sram_stat->stat.Bundl1Rdy3);
+            sram_stat->stat.Bundl1Rdy3);
     }
     uart_putc('\n');
 }

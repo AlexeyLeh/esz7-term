@@ -13,7 +13,7 @@
 #include "uart.h"
 #include "ver.h"
 
-cfg_t cfg;
+cfg_t cfg = {};
 
 //---------------------------------------------------------
 #ifdef LINUX_VARIANT
@@ -49,6 +49,7 @@ void help()
 	      "  - C              - Calibration commands\n"
 	      "  - t  (T)         - ADC Autoscan Start/Stop\n"
 	      "  - u              - Read ADC Output Registers\n"
+	      "  - L              - Lights\n"
 #ifdef INTERRUPT
 	      "  - g              - Enable/Disable interrupts\n"
 	      "  - G              - Print Generic Interrupt Conntroller register\n"

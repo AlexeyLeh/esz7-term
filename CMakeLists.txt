@@ -82,6 +82,7 @@ set(SOURCES
         src/ver.c
         src/ver.h
         src/calibration.c
+        src/lights.c
 )
 
 add_executable(${EXE} ${SOURCES})

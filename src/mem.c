@@ -32,23 +32,22 @@ bool map_registers()
     cfg.mem.reg_mem_map = NULL;
 
     int mem_fd = open("/dev/mem", O_RDWR);
-    if (mem_fd == -1)
-    {
-	uart_puts("can't open /dev/mem\n");
-	unmap_registers();
-	return FAIL;
+    if (mem_fd == -1) {
+	    uart_puts("can't open /dev/mem\n");
+	    unmap_registers();
+	    return FAIL;
     }
 
-    uart_printf("Register address:  0x%02x  ", ESZ7_ADDR);
     // cfg.reg_mem_map = mmap(0, ESZ7_ADDR, PROT_READ | PROT_WRITE, MAP_SHARED, cfg.mem_fd, BASE_ADDR);
     void *mem_map = mmap(0, ESZ7_ADDR_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, mem_fd, ESZ7_ADDR);
-    if (mem_map == MAP_FAILED)
-    {
-	uart_puts("- mapping failed");
-	unmap_registers();
-	return FAIL;
+    if (mem_map == MAP_FAILED) {
+	    uart_printf("Register address:  0x%02x  - mapping failed", ESZ7_ADDR);
+	    unmap_registers();
+    	return FAIL;
     }
-    uart_printf("(mapped to %p, /dev/mem fd:%d)\n", mem_map, mem_fd);
+    if (cfg.debug_level > 0) {
+    	uart_printf("Register address:  0x%02x  (mapped to %p, /dev/mem fd:%d)\n", ESZ7_ADDR, mem_map, mem_fd);
+    }
 
     cfg.mem.reg_mem_fd = mem_fd;
     cfg.mem.reg_mem_map = mem_map;
@@ -64,18 +63,15 @@ bool map_registers()
 bool unmap_registers()
 {
     bool ret = OK; // success assumed
-    if (cfg.mem.reg_mem_map)
-    {
-	if (munmap(cfg.mem.reg_mem_map, ESZ7_ADDR) == -1)
-	{
+    if (cfg.mem.reg_mem_map) {
+	if (munmap(cfg.mem.reg_mem_map, ESZ7_ADDR) == -1) {
 	    uart_printf("%s(): %p unmapping failed (%s)\n", __func__, cfg.mem.reg_mem_map, strerror(errno));
 	    ret = FAIL;
 	}
 	cfg.mem.reg_mem_map = NULL;
     }
 
-    if (close(cfg.mem.reg_mem_fd) == -1)
-    {
+    if (close(cfg.mem.reg_mem_fd) == -1) {
 	uart_printf("%s(): fd:%d close error (%s)\n", __func__, cfg.mem.reg_mem_fd, strerror(errno));
 	ret = FAIL;
     }
@@ -96,22 +92,22 @@ bool map_chip_mem()
 
     for (int ch = 1; ch <= sram()->numChannels; ch++) {
 	int mem_fd = open("/dev/mem", O_RDWR);
-	if (mem_fd == -1)
-	{
+	if (mem_fd == -1) {
 	    uart_puts("can't open /dev/mem\n");
 	    unmap_chip_mem();
 	    return 0;
 	}
 
-	uart_printf("SRAM-%d address:    0x%02x  ", ch, (void *)sram_mem(ch));
 	void *mem_map = mmap(0, sram_mem_size(), PROT_READ | PROT_WRITE, MAP_SHARED, mem_fd, (off_t)sram_mem(ch));
-	if (mem_map == MAP_FAILED)
-	{
-	    uart_puts("- mapping failed");
+	if (mem_map == MAP_FAILED) {
+	    uart_printf("SRAM-%d address:    0x%02x  - mapping failed", ch, (void *)sram_mem(ch));
 	    unmap_chip_mem();
 	    return 0;
 	}
-	uart_printf("(mapped to %p, /dev/mem fd:%d)\n", mem_map, mem_fd);
+	if (cfg.debug_level > 0) {
+	    uart_printf("SRAM-%d address:    0x%02x  (mapped to %p, /dev/mem fd:%d)\n", ch, (void *)sram_mem(ch),
+			mem_map, mem_fd);
+	}
 	cfg.mem.sram_fd[ch-1] = mem_fd;
 	cfg.mem.sram_map[ch-1] = mem_map;
     }
@@ -177,6 +173,7 @@ bool setup_registers_memory()
     sram()->mem[2] = (sram_mem_t *)((uint32_t)cfg.mem.sram_map[2]);
     sram()->mem[3] = (sram_mem_t *)((uint32_t)cfg.mem.sram_map[3]);
 
+    if (cfg.debug_level > 0) {
     uart_printf("Registers:\n");
     uart_printf("  Firmware Vers:     %p (0x%02X)\n", FwVerRegAdr, FMWREG_ADDR);
     uart_printf("  Device status:     %p (0x%02X)\n", DevStatAdr,  DEVSTAT_ADDR);
@@ -198,10 +195,15 @@ bool setup_registers_memory()
     for (int i = 0; i < sram()->numChannels; i++) {
 	    uart_printf("  SRAM-%d memory:     %p         \n", i, (void *)sram()->mem[i]);
     }
+	uart_putc('\n');
+    }
     return OK;
 }
 #else
 
-bool setup_registers_memory() { return OK; }
+bool setup_registers_memory()
+{
+    return OK;
+}
 
 #endif

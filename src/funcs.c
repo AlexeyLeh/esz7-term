@@ -14,10 +14,23 @@
 #include "funcs.h"
 #include "interrupts.h"
 #include "sram.h"
+#include "mem.h"
 #include "sram_t.h"
 #include "uart.h"
 
 int selectedADC = 1;
+
+//---------------------------------------------------------
+void finish()
+{
+#ifdef LINUX_VARIANT
+    uart_reset();
+    unmap_registers();
+    unmap_chip_mem();
+#endif
+    uart_putc('\n');
+    // exit(0);
+}
 
 //---------------------------------------------------------
 void select_adc()
@@ -535,7 +548,7 @@ void AutoScan_control_all()
 void print_firmware_version()
 {
     uint32_t data = *FwVerRegAdr;
-    if (cfg.debug_level > 0) {
+    if (cfg.debug_level >= 2) {
 	uart_printf("%p => 0x%08X\n", FwVerRegAdr, data);
     }
     uart_printf("FPGA Firmware version: %08X\n", data);

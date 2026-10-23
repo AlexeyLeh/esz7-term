@@ -7,8 +7,6 @@
 
 #include "dev.h"
 #include "funcs.h"
-#include "mem.h"
-// #include "timecode.h"
 #include "uart.h"
 
 #include <stdbool.h>
@@ -435,12 +433,7 @@ void calibration_stuff() // ADC calibration
 	    }
 
 	} else if (cmd == 'q') {
-#ifdef LINUX_VARIANT
-	    uart_reset();
-	    unmap_registers();
-	    unmap_chip_mem();
-#endif
-	    uart_putc('\n');
+	    finish();
 	    exit(0);
 	} else {
 	    uart_puts("invalid command\n");

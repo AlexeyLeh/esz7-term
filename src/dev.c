@@ -390,14 +390,14 @@ bool autoscan_mode(int adc_num) {
     cmd.bits.CmdOpCode = CmdReadDevStat;
     cmd.bits.AdcChannels = channel_to_onehot(adc_num);
     cmd.bits.CmdParam = 0;
-    if (cfg.debug_level > 0) {
+    if (cfg.debug_level >= 2) {
 	uart_printf("DevCmd.value: 0x%08X\n", cmd.value );
     }
 
     *DevCtrlAdr = cmd;
     stat = *DevStatAdr;
     int autoscan = (stat.bits.AdcMode >> (adc_num-1));
-    if (cfg.debug_level > 0) {
+    if (cfg.debug_level >= 2) {
 	uart_printf("DevStat.value: 0x%08X\n", stat.value );
     }
     autoscan &= 0x01;

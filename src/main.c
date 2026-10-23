@@ -24,18 +24,21 @@ int main(int ac, char *av[])
     if (parse_args(ac, av) == DONE) {
 	return 0;
     }
-#else
-    cfg.debug_level = 0;
 #endif
 
     //-------------------------------------------
-    uart_puts("\n\n\n\n");
+    uart_puts("\n\n");
+    if (!setup_registers_memory()) {
+        return 1;
+    }
+
     about();
+    print_firmware_version();
     print_app_version();
     uart_putc('\n');
 
     if (cfg.debug_level > 0) {
-	uart_printf("debug_level: %d\n", cfg.debug_level);
+	uart_printf("\ndebug_level: %d\n", cfg.debug_level);
 	uart_puts("-- to change 'Setup command -> Set debug' ");
 	uart_puts("['s' -> 'd']\n\n");
     }
@@ -49,29 +52,16 @@ int main(int ac, char *av[])
     }
 #endif
 
-    if (!setup_registers_memory()) {
-	return 1;
-    }
-
-#if 0
-    uint8_t value;
-	if (ADCReadRegister(selectedADC, RegMode0, &value)) {
-		// MODE0 factory default
-		if (value == 0x24) 	{
-			uart_putc('\n');
-			init();
-		}
-	}
-#endif
+    sram_check(0);
 
     uart_putc('\n');
     uart_puts("-- type 'h' to see available commands\n");
     uart_puts("-- Press ESC to cancel any operation(s)\n\n");
 
-    sram_check(0);
 
     //-------------------------------------------
     uint8_t cmd = 0;
+    //cmd = 'L';
     int work = 1;
     while (work) {
 #if 0
@@ -89,11 +79,13 @@ int main(int ac, char *av[])
 
 	uart_printf("ADC-%d> ", selectedADC);
 
-	cmd = GetSymb(); // Wait input & Send echo
-			 // uart_printf("cmd: %Xh\n", cmd);
-	if (cmd != '\r' && cmd != '\n') {
-	    uart_putc('\n');
-	}
+        if (cmd == 0) { // for debug
+            cmd = GetSymb(); // Wait input & Send echo
+            // uart_printf("cmd: %Xh\n", cmd);
+            if (cmd != '\r' && cmd != '\n') {
+                uart_putc('\n');
+            }
+        }
 
 	//-- control word analysis ------------------------------------------
 	switch (cmd) {
@@ -185,6 +177,12 @@ int main(int ac, char *av[])
 	case 'S':
 	    {
 		setup_stuff();
+		break;
+	    }
+
+	case 'L':
+	    {
+		check_lights();
 		break;
 	    }
 
@@ -296,15 +294,11 @@ int main(int ac, char *av[])
 	if (cmd != 0x1B) {
 	    uart_puts("\n");
 	}
-	// cmd = 0;
+
+        cmd = 0;
+
     } // end while(1);
 
-    //-------------------------------------------
-#ifdef LINUX_VARIANT
-    uart_reset();
-    unmap_registers();
-    unmap_chip_mem();
-#endif
-    uart_putc('\n');
+    finish();
     return 0;
 }

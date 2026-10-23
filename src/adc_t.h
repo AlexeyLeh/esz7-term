@@ -12,6 +12,7 @@
 #ifndef ADC_T__H_
 #define ADC_T__H_
 
+#include <stdbool.h>
 #include <stdint.h>
 
 // Register map

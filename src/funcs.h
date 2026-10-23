@@ -10,7 +10,10 @@
 
 #include "dev.h"
 
-void select_adc();
+#define TS_1SEC (1000*1000)
+#define TS_100MS (1000*100)
+#define TS_10MS (1000*10)
+
 
 // Control commands
 void adc_nop();
@@ -27,6 +30,7 @@ void adc_read_register();
 void adc_write_register();
 
 // Miscellaneous
+void select_adc();
 void adc_read_id();
 void adc_lists_registers();
 void adc_read_regs();
@@ -37,10 +41,11 @@ bool ADCReadRegister(int adc_num, uint8_t reg_num, uint8_t *value);
 bool ADCWriteRegister(int adc_num, uint8_t reg_num, uint8_t value);
 bool ADCReadID(int adc_num, uint8_t *id);
 
+void finish();
 void init();
 void print_firmware_version();
-//// void print_calibration_info(int adc_num);
 void setup_stuff();
+void check_lights();
 void calibration_stuff();
 void AutoScan_control(int adc_num);
 void AutoScan_control_all();
