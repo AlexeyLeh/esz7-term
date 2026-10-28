@@ -323,7 +323,7 @@ static bool export_gpio_led(GPIO_EXPORT mode)
     }
     char buf[32] = {};
     if (read(fd, buf, sizeof(buf)) == -1) {
-        uart_printf("ERROR: can't read current direction status (%s)\n", PIN13, gpio_pin_filename);
+        uart_puts("ERROR: can't read current direction status\n");
         close(fd);
         return false;
     }
