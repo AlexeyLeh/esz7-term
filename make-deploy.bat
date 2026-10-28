@@ -48,8 +48,8 @@ call build.bat %BUILDTYPE%
 :: -----------------------------------------------
 @SET TARGETNAME=%PRJNAME%-%DT%
 
-@SET TARGET_BIN_DIR=..\%PRJNAME%-bin-%VERSION%-%DT%
-@SET TARGET_SRC_DIR=..\%PRJNAME%-src-%VERSION%-%DT%
+@SET TARGET_BIN_DIR=..\%PRJNAME%-%VERSION%-bin-%DT%
+@SET TARGET_SRC_DIR=..\%PRJNAME%-%VERSION%-src-%DT%
 
 @rd /s /q %TARGET_BIN_DIR% 2>NUL 
 @rd /s /q %TARGET_SRC_DIR% 2>NUL
